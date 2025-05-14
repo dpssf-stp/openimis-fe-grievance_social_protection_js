@@ -6,8 +6,11 @@ import React, { Component, Fragment } from 'react';
 import { injectIntl } from 'react-intl';
 import { connect } from 'react-redux';
 import LockOpenIcon from '@material-ui/icons/LockOpen';
+import { Badge } from "@material-ui/core";
+import AttachIcon from "@material-ui/icons/AttachFile";
 import {
   Form, formatMessageWithValues, journalize, ProgressOrError, withModulesManager, formatMessage,
+  PublishedComponent, Contributions,
 } from '@openimis/fe-core';
 import { bindActionCreators } from 'redux';
 import {
@@ -18,7 +21,10 @@ import { ticketLabel } from '../utils/utils';
 import EditTicketPage from '../pages/EditTicketPage';
 import AddTicketPage from '../pages/AddTicketPage';
 import TicketCommentPanel from './TicketCommentsPanel';
-import { MODULE_NAME, TICKET_STATUSES } from '../constants';
+import { MODULE_NAME, RIGHT_TICKET_ADD, TICKET_STATUSES } from '../constants';
+
+
+const TICKET_FORM_CONTRIBUTION_KEY = "grievanceSocialProtection.TicketForm";
 
 class TicketForm extends Component {
   constructor(props) {
@@ -28,7 +34,10 @@ class TicketForm extends Component {
       reset: 0,
       ticketUuid: null,
       ticket: this._newTicket(),
+      attachmentsTicket: null,
     };
+
+    this.ticketAttachments = props.modulesManager.getConf("fe-grievance_social_protection", "ticketAttachments", true);
   }
 
   componentDidMount() {
@@ -124,6 +133,7 @@ class TicketForm extends Component {
       fetchedTicket,
       errorTicket,
       save, back,
+      rights,
     } = this.props;
 
     const {
@@ -140,33 +150,53 @@ class TicketForm extends Component {
       {
         doIt: this.reopenTicket,
         icon: <LockOpenIcon />,
-        onlyIfDirty: ticket.status !== TICKET_STATUSES.CLOSED,
+        onlyIfDirty: ![TICKET_STATUSES.CLOSED, TICKET_STATUSES.REJECTED].includes(ticket?.status),
         disabled: ticket.isHistory,
       },
     ];
+
+    // if (!!this.ticketAttachments && (!readOnly || ticket.attachmentsCount > 0)) {
+    //   actions.push({
+    //     doIt: (e) => this.setState({ attachmentsTicket: ticket }),
+    //     icon: (
+    //       <Badge badgeContent={this.state.ticket?.attachmentsCount ?? 0} color="primary">
+    //         <AttachIcon />
+    //       </Badge>
+    //     ),
+    //   });
+    // }
 
     return (
       <>
         <ProgressOrError progress={fetchingTicket} error={errorTicket} />
         {(!!fetchedTicket || !ticketUuid) && (
-        <Form
-          module={MODULE_NAME}
-          edited_id={ticketUuid}
-          edited={ticket}
-          reset={reset}
-          update={update}
-          title="ticket.title.bar"
-          titleParams={{ label: ticketLabel(this.state.ticket) }}
-          back={back}
-          save={save ? this._save : null}
-          canSave={this.canSave}
-          reload={(ticketUuid || readOnly) && this.reload}
-          readOnly={readOnly}
-          overview={overview}
-          Panels={ticketUuid ? [EditTicketPage, TicketCommentPanel] : [AddTicketPage]}
-          onEditedChanged={this.onEditedChanged}
-          actions={actions}
-        />
+          <Fragment>
+            {/* <PublishedComponent
+              pubRef="grievanceSocialProtection.TicketAttachmentsDialog"
+              readOnly={!rights.includes(RIGHT_TICKET_ADD) || readOnly}
+              ticket={this.state.attachmentsTicket}
+              close={(e) => this.setState({ attachmentsTicket: null })}
+              onUpdated={() => this.setState({ forcedDirty: true })}
+            /> */}
+            <Form
+              module={MODULE_NAME}
+              edited_id={ticketUuid}
+              edited={ticket}
+              reset={reset}
+              update={update}
+              title="ticket.title.bar"
+              titleParams={{ label: ticketLabel(this.state.ticket) }}
+              back={back}
+              save={save ? this._save : null}
+              canSave={this.canSave}
+              reload={(ticketUuid || readOnly) && this.reload}
+              readOnly={readOnly}
+              overview={overview}
+              Panels={ticketUuid ? [EditTicketPage, TicketCommentPanel] : [AddTicketPage]}
+              onEditedChanged={this.onEditedChanged}
+              actions={actions}
+            />
+          </Fragment>
         )}
       </>
     );

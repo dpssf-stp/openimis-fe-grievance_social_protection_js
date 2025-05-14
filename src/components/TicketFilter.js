@@ -127,7 +127,7 @@ class TicketFilter extends Component {
                 )}
               />
             </Grid>
-                      )}
+          )}
         />
         <ControlledField
           module={MODULE_NAME}

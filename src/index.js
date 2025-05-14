@@ -9,6 +9,10 @@ import TicketPage from './pages/TicketPage';
 import TicketSearcher from './components/TicketSearcher';
 import TicketPriorityPicker from './pickers/TicketPriorityPicker';
 import TicketStatusPicker from './pickers/TicketStatusPicker';
+import TicketAttachmentStatusPicker from './pickers/TicketAttachmentStatusPicker';
+import TicketAttachmentGeneralTypePicker from './pickers/TicketAttachmentGeneralTypePicker';
+import TicketAttachmentPredefinedTypePicker from './pickers/TicketAttachmentPredefinedTypePicker';
+import TicketAttachmentsDialog from './dialogs/TicketAttachmentsDialog';
 import CategoryPicker from './pickers/CategoryPicker';
 import GrievanceConfigurationDialog from './dialogs/GrievanceConfigurationDialog';
 import ChannelPicker from './pickers/ChannelPicker';
@@ -35,7 +39,10 @@ const DEFAULT_CONFIG = {
     { key: 'grievanceSocialProtection.FlagPicker', ref: FlagPicker },
     { key: 'grievanceSocialProtection.ChannelPicker', ref: ChannelPicker },
     { key: 'grievanceSocialProtection.GrievanceConfigurationDialog', ref: GrievanceConfigurationDialog },
-
+    { key: 'grievanceSocialProtection.TicketAttachmentStatusPicker', ref: TicketAttachmentStatusPicker },
+    { key: 'grievanceSocialProtection.TicketAttachmentGeneralTypePicker', ref: TicketAttachmentGeneralTypePicker },
+    { key: 'grievanceSocialProtection.TicketAttachmentPredefinedTypePicker', ref: TicketAttachmentPredefinedTypePicker },
+    { key: 'grievanceSocialProtection.TicketAttachmentsDialog', ref: TicketAttachmentsDialog },
   ],
   'core.Router': [
     { path: ROUTE_TICKET_TICKETS, component: TicketsPage },

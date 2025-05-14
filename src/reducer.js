@@ -99,6 +99,7 @@ function reducer(
         ticket: parseData(action.payload.data.tickets).map((ticket) => ({
           ...ticket,
           id: decodeId(ticket.id),
+          reporterInfo: ticket.reporterInfo ? JSON.parse(ticket.reporterInfo) : {}, // Parse reporterInfo JSON
         }))?.[0],
         errorTicket: formatGraphQLError(action.payload),
       };
@@ -259,6 +260,12 @@ function reducer(
       return dispatchMutationErr(state, action);
     case 'TICKET_CREATE_TICKET_ATTACHMENT_RESP':
       return dispatchMutationResp(state, 'createTicketAttachment', action);
+    case "TICKET_CREATE_TICKET_ATTACHMENT_RESP":
+      return dispatchMutationResp(state, "createTicketAttachment", action);
+    case "TICKET_UPDATE_TICKET_ATTACHMENT_RESP":
+      return dispatchMutationResp(state, "updateTicketAttachment", action);
+    case "TICKET_DELETE_TICKET_ATTACHMENT_RESP":
+      return dispatchMutationResp(state, "deleteTicketAttachment", action);
     default:
       return state;
   }

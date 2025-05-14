@@ -51,7 +51,7 @@ export function fetchTicket(mm, filters) {
   const projections = [
     'id', 'title', 'code', 'description', 'status',
     'priority', 'dueDate', 'reporter', 'reporterId',
-    'reporterType', 'reporterTypeName', 'category', 'flags', 'channel',
+    'reporterType', 'reporterTypeName', 'reporterInfo', 'category', 'flags', 'channel',
     'resolution', 'title', 'dateOfIncident', 'dateCreated',
     'attendingStaff {id, username}', 'version', 'isHistory,', 'jsonExt',
   ];
@@ -90,32 +90,34 @@ export function fetchComments(ticket) {
 }
 
 export function formatTicketGQL(ticket) {
+  let reporter_info = JSON.stringify(JSON.stringify(ticket.reporterInfo));
+  let reporterId = ticket.reporter ? (
+    isBase64Encoded(ticket.reporter.id) ? decodeId(ticket.reporter.id) : ticket.reporter.id
+  ) : '';
+  console.log('ticket', ticket);
+  console.log('reporterId', reporterId);
+
   return `
     ${ticket.id !== undefined && ticket.id !== null ? `id: "${ticket.id}"` : ''}
     ${ticket.code ? `code: "${formatGQLString(ticket.code)}"` : ''}
-    ${!!ticket.category && !!ticket.category ? `category: "${ticket.category}"` : ''}
-    ${!!ticket.title && !!ticket.title ? `title: "${ticket.title}"` : ''}
-    ${!!ticket.attendingStaff && !!ticket.attendingStaff ? `attendingStaffId: "${decodeId(ticket.attendingStaff.id)}"` : ''}
-    ${!!ticket.description && !!ticket.description ? `description: "${ticket.description}"` : ''}
-    ${ticket.reporter
-    ? (isBase64Encoded(ticket.reporter.id)
-      ? `reporterId: "${decodeId(ticket.reporter.id)}"`
-      : `reporterId: "${ticket.reporter.id}"`)
-    : ''}
-    ${!!ticket.reporterType && !!ticket.reporterType ? `reporterType: "${ticket.reporterType}"` : ''}
-    ${ticket.nameOfComplainant ? `nameOfComplainant: "${formatGQLString(ticket.nameOfComplainant)}"` : ''}
-    ${ticket.resolution ? `resolution: "${formatGQLString(ticket.resolution)}"` : ''}
-    ${ticket.status ? `status: "${formatGQLString(ticket.status)}"` : ''}
-    ${ticket.priority ? `priority: "${formatGQLString(ticket.priority)}"` : ''}
-    ${ticket.dueDate ? `dueDate: "${formatGQLString(ticket.dueDate)}"` : ''}
-    ${ticket.dateSubmitted ? `dateSubmitted: "${formatGQLString(ticket.dateSubmitted)}"` : ''}
-    ${ticket.dateOfIncident ? `dateOfIncident: "${formatGQLString(ticket.dateOfIncident)}"` : ''}
-    ${!!ticket.channel && !!ticket.channel ? `channel: "${ticket.channel}"` : ''}
-    ${!!ticket.flags && !!ticket.flags ? `flags: "${ticket.flags}"` : ''}
+    ${ticket.category ? `category: "${ticket.category}"` : ''}
+    ${ticket.title ? `title: "${ticket.title}"` : ''}
+    ${ticket.description ? `description: "${ticket.description}"` : ''}
+    ${ticket.reporterType ? `reporterType: "${ticket.reporterType}"` : ''}
+    ${ticket.reporterId ? `reporterId: "${reporterId}"` : ''}
+    ${ticket.reporterInfo ? `reporterInfo: ${reporter_info}` : ''}
+    ${ticket.status ? `status: "${ticket.status}"` : ''}
+    ${ticket.priority ? `priority: "${ticket.priority}"` : ''}
+    ${ticket.dueDate ? `dueDate: "${ticket.dueDate}"` : ''}
+    ${ticket.dateOfIncident ? `dateOfIncident: "${ticket.dateOfIncident}"` : ''}
+    ${ticket.channel ? `channel: "${ticket.channel}"` : ''}
+    ${ticket.flags ? `flags: "${ticket.flags}"` : ''}
   `;
 }
 
 export function formatUpdateTicketGQL(ticket) {
+  let reporter_info = JSON.stringify(JSON.stringify(ticket.reporterInfo));
+
   // eslint-disable-next-line no-param-reassign
   if (ticket.reporter) ticket.reporter = JSON.parse(JSON.parse(ticket.reporter || '{}'), '{}');
   return `
@@ -131,6 +133,7 @@ export function formatUpdateTicketGQL(ticket) {
     : ''}
     ${!!ticket.reporter && !!ticket.reporter ? 'reporterType: "Individual"' : ''}
     ${ticket.nameOfComplainant ? `nameOfComplainant: "${formatGQLString(ticket.nameOfComplainant)}"` : ''}
+    ${ticket.reporterInfo ? `reporterInfo: ${reporter_info}` : ''}
     ${ticket.resolution ? `resolution: "${formatGQLString(ticket.resolution)}"` : ''}
     ${ticket.status ? `status: ${formatGQLString(ticket.status)}` : ''}
     ${ticket.priority ? `priority: "${formatGQLString(ticket.priority)}"` : ''}
@@ -203,6 +206,55 @@ export function fetchTicketAttachments(ticket) {
   return { type: 'TICKET_TICKET_ATTACHMENTS', payload: { data: [] } };
 }
 
+export function formatTicketAttachment(attach) {
+  return `
+    ${!!attach.id ? `id: "${decodeId(attach.id)}"` : ""}
+    ${!!attach.ticketUuid ? `ticketUuid: "${attach.ticketUuid}"` : ""}
+    ${!!attach.type ? `type: "${formatGQLString(attach.type)}"` : ""}
+    ${!!attach.title ? `title: "${formatGQLString(attach.title)}"` : ""}
+    ${!!attach.date ? `date: "${attach.date}"` : ""}
+    ${!!attach.mime ? `mime: "${attach.mime}"` : ""}
+    ${!!attach.url ? `url: "${attach.url}"` : ""}
+    ${!!attach.generalType ? `generalType: "${attach.generalType}"` : ""}
+    ${attach.predefinedType ? `predefinedType: "${attach.predefinedType.ticketAttachmentType}"` : ""}
+    ${!!attach.filename ? `filename: "${formatGQLString(attach.filename)}"` : ""}
+    ${!!attach.document ? `document: "${attach.document}"` : ""}
+  `;
+}
+
+export function createAttachment(attach, clientMutationLabel) {
+  debugger;
+  const payload = formatTicketAttachment(attach);
+  const mutation = formatMutation("createTicketAttachment", payload, clientMutationLabel);
+  const requestedDateTime = new Date();
+  return graphql(mutation.payload, ["TICKET_MUTATION_REQ", "TICKET_CREATE_TICKET_ATTACHMENT_RESP", "TICKET_MUTATION_ERR"], {
+    clientMutationId: mutation.clientMutationId,
+    clientMutationLabel,
+    requestedDateTime,
+  });
+}
+
+export function updateAttachment(attach, clientMutationLabel) {
+  let payload = formatTicketAttachment(attach);
+  let mutation = formatMutation("updateTicketAttachment", payload, clientMutationLabel);
+  var requestedDateTime = new Date();
+  return graphql(mutation.payload, ["TICKET_MUTATION_REQ", "TICKET_UPDATE_TICKET_ATTACHMENT_RESP", "TICKET_MUTATION_ERR"], {
+    clientMutationId: mutation.clientMutationId,
+    clientMutationLabel,
+    requestedDateTime,
+  });
+}
+
+export function deleteAttachment(attach, clientMutationLabel) {
+  let mutation = formatMutation("deleteTicketAttachment", `id: "${decodeId(attach.id)}"`, clientMutationLabel);
+  var requestedDateTime = new Date();
+  return graphql(mutation.payload, ["TICKET_MUTATION_REQ", "TICKET_DELETE_TICKET_ATTACHMENT_RESP", "TICKET_MUTATION_ERR"], {
+    clientMutationId: mutation.clientMutationId,
+    clientMutationLabel,
+    requestedDateTime,
+  });
+}
+
 export function downloadAttachment(attach) {
   const url = new URL(`${window.location.origin}${baseApiUrl}/ticket/attach`);
   url.search = new URLSearchParams({ id: decodeId(attach.id) });
@@ -212,6 +264,7 @@ export function downloadAttachment(attach) {
 }
 
 export function formatTicketAttachmentGQL(ticketattachment) {
+  debugger;
   return `
     ${ticketattachment.uuid !== undefined && ticketattachment.uuid !== null ? `uuid: "${ticketattachment.uuid}"` : ''}
     ${!!ticketattachment.ticket && !!ticketattachment.ticket.id ? `ticketUuid: "${ticketattachment.ticket.uuid}"` : ''}

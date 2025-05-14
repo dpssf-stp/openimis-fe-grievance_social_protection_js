@@ -27,7 +27,9 @@ import {
 import { Save } from '@material-ui/icons';
 import { updateTicket, fetchTicket, createTicketComment } from '../actions';
 import { EMPTY_STRING, MODULE_NAME } from '../constants';
+import { GRIEVANT_TYPES } from '../constants';
 import TicketPrintTemplate from '../components/TicketPrintTemplate';
+import ReporterFields from '../components/ReporterFields';
 
 const styles = (theme) => ({
   paper: theme.paper.paper,
@@ -67,9 +69,11 @@ class EditTicketPage extends Component {
   }
 
   save = () => {
+    const { stateEdited } = this.state;
+
     this.props.updateTicket(
-      this.state.stateEdited,
-      `updated ticket ${this.state.stateEdited.code}`,
+      stateEdited,
+      `Updated Ticket ${stateEdited.title}`,
     );
   };
 
@@ -109,7 +113,7 @@ class EditTicketPage extends Component {
       <div className={classes.page}>
         <Grid container>
           <Grid item xs={12}>
-            {stateEdited.reporter && (
+            {(stateEdited.reporter || stateEdited.reporterInfo) && (
             <Paper className={classes.paper}>
               <Grid container className={classes.tableTitle}>
                 <Grid item xs={8} className={classes.tableTitle}>
@@ -119,7 +123,7 @@ class EditTicketPage extends Component {
                 </Grid>
               </Grid>
               <Grid container className={classes.item}>
-                {stateEdited.reporterTypeName === 'individual' && (
+                {stateEdited.reporter && stateEdited.reporterTypeName === GRIEVANT_TYPES.INDIVIDUAL && (
                 <Grid item xs={3} className={classes.item}>
                   <PublishedComponent
                     pubRef="individual.IndividualPicker"
@@ -133,73 +137,13 @@ class EditTicketPage extends Component {
               </Grid>
               <Divider />
               <Grid container className={classes.item}>
-                {stateEdited.reporterTypeName === 'individual' && (
-                <>
-                  <Grid item xs={4} className={classes.item}>
-                    <TextInput
-                      module={MODULE_NAME}
-                      label="ticket.name"
-                      value={reporter && reporter.individual
-                        ? `${reporter.individual.firstName} ${reporter.individual.lastName} ${reporter.individual.dob}`
-                        : reporter
-                          ? `${reporter.firstName} ${reporter.lastName} ${reporter.dob}`
-                          : EMPTY_STRING}
-                      onChange={(v) => this.updateAttribute('name', v)}
-                      required={false}
-                      readOnly
-                    />
-                  </Grid>
-                  <Grid item xs={4} className={classes.item}>
-                    <TextInput
-                      module={MODULE_NAME}
-                      label="ticket.phone"
-                      value={!!stateEdited && !!stateEdited.reporter
-                        ? this.extractFieldFromJsonExt(reporter, 'phone')
-                        : EMPTY_STRING}
-                      onChange={(v) => this.updateAttribute('phone', v)}
-                      required={false}
-                      readOnly
-                    />
-                  </Grid>
-                  <Grid item xs={4} className={classes.item}>
-                    <TextInput
-                      module={MODULE_NAME}
-                      label="ticket.email"
-                      value={!!stateEdited && !!stateEdited.reporter
-                        ? this.extractFieldFromJsonExt(reporter, 'email')
-                        : EMPTY_STRING}
-                      onChange={(v) => this.updateAttribute('email', v)}
-                      required={false}
-                      readOnly
-                    />
-                  </Grid>
-                </>
-                )}
-                {stateEdited.reporterTypeName === 'beneficiary' && (
-                <>
-                  <Grid item xs={4} className={classes.item}>
-                    <TextInput
-                      module={MODULE_NAME}
-                      label="ticket.nationalId"
-                      value={reporter?.jsonExt?.national_id ?? ''}
-                      required={false}
-                      readOnly
-                    />
-                  </Grid>
-                  <Grid item xs={4} className={classes.item}>
-                    <TextInput
-                      module={MODULE_NAME}
-                      label="ticket.email"
-                      value={!!stateEdited && !!stateEdited.reporter
-                        ? this.extractFieldFromJsonExt(reporter, 'email')
-                        : EMPTY_STRING}
-                      onChange={(v) => this.updateAttribute('email', v)}
-                      required={false}
-                      readOnly
-                    />
-                  </Grid>
-                </>
-                )}
+                {stateEdited.reporterTypeName === null || stateEdited.reporterTypeName === GRIEVANT_TYPES.INDIVIDUAL ? (
+                  <ReporterFields
+                    stateEdited={stateEdited}
+                    updateAttribute={this.updateAttribute}
+                    isSaved={propsReadOnly}
+                  />
+                ) : null}
               </Grid>
             </Paper>
             )}

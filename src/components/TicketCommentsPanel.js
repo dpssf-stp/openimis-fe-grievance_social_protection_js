@@ -169,7 +169,7 @@ class TicketCommentPanel extends Component {
     );
   };
 
-  isReadOnly = () => this.props?.ticket?.status === TICKET_STATUSES.CLOSED || this.props?.ticket?.isHistory;
+  isReadOnly = () => [TICKET_STATUSES.CLOSED, TICKET_STATUSES.REJECTED].includes(this.props?.ticket?.status) || this.props?.ticket?.isHistory;
 
   filterComments = (comments) => {
     if (!comments) return comments;

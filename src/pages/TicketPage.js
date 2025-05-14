@@ -51,7 +51,7 @@ class TicketPage extends Component {
     const {
       classes, modulesManager, history, rights, ticketUuid, overview, ticket, ticketVersion,
     } = this.props;
-    const readOnly = ticket?.status === TICKET_STATUSES.CLOSED || ticket?.isHistory;
+    const readOnly = [TICKET_STATUSES.CLOSED, TICKET_STATUSES.REJECTED].includes(ticket?.status) || ticket?.isHistory;
     if (!(rights.includes(RIGHT_TICKET_EDIT)||rights.includes(RIGHT_TICKET_ADD))) return null;
     return (
       <div className={`${readOnly ? classes.lockedPage : null} ${classes.page}`}>

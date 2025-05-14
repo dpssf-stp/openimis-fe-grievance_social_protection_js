@@ -3,6 +3,7 @@ export const TICKET_STATUSES = {
   OPEN: 'OPEN',
   IN_PROGRESS: 'IN_PROGRESS',
   RESOLVED: 'RESOLVED',
+  REJECTED: 'REJECTED',
   CLOSED: 'CLOSED',
 };
 export const TICKET_STATUS = [
@@ -10,6 +11,7 @@ export const TICKET_STATUS = [
   TICKET_STATUSES.OPEN,
   TICKET_STATUSES.IN_PROGRESS,
   TICKET_STATUSES.RESOLVED,
+  TICKET_STATUSES.REJECTED,
   TICKET_STATUSES.CLOSED,
 ];
 
@@ -26,5 +28,35 @@ export const MODULE_NAME = 'grievanceSocialProtection';
 export const FETCH_INDIVIDUAL_REF = 'individual.actions.fetchIndividuals';
 
 export const EMPTY_STRING = '';
-export const GRIEVANT_TYPE_LIST = ['individual', 'beneficiary', 'user'];
+export const GRIEVANT_TYPES = {
+  INDIVIDUAL: 'individual',
+  BENEFICIARY: 'beneficiary',
+  USER: 'user',
+};
+
+export const GRIEVANT_TYPE_LIST = [GRIEVANT_TYPES.INDIVIDUAL, GRIEVANT_TYPES.USER];
 export const GRIEVANCE_MAIN_MENU_CONTRIBUTION_KEY = 'grievance.MainMenu';
+
+export const GRIEVANT_SEX = {
+  MALE: 'M',
+  FEMALE: 'F'
+}
+
+export const GRIEVANT_SEX_LIST = [
+  GRIEVANT_SEX.MALE, GRIEVANT_SEX.FEMALE
+]
+
+export const DEFAULT = {
+  IS_ADDITIONAL_PANEL_ENABLED: false,
+  ALLOWED_DOMAINS_ATTACHMENTS: [],
+  RENDER_LAST_NAME_FIRST: true,
+};
+
+// NULL - all tickets, 1 - with attachments, 2 - without attachments
+export const ATTACHMENT_STATUS_WITH = 1;
+export const ATTACHMENT_STATUS_WITHOUT = 2;
+export const TICKET_ATTACHMENT_STATUS = [ATTACHMENT_STATUS_WITH, ATTACHMENT_STATUS_WITHOUT];
+
+export const URL_TYPE_STRING = "URL";
+export const FILE_TYPE_STRING = "FILE";
+export const TICKET_ATTACHMENT_TYPE_STATUS = [URL_TYPE_STRING, FILE_TYPE_STRING];
