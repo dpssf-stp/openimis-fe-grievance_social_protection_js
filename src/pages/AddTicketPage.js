@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 /* eslint-disable react/no-unused-state */
 /* eslint-disable no-unused-vars */
 /* eslint-disable react/destructuring-assignment */
@@ -45,12 +46,10 @@ class AddTicketPage extends Component {
   }
 
   save = () => {
-    const { stateEdited } = this.state;
-
     this.props.createTicket(
-      stateEdited,
+      this.state.stateEdited,
       this.props.grievanceConfig,
-      `Created Ticket ${stateEdited.title}`,
+      `Created Ticket ${this.state.stateEdited.title}`,
     );
 
     this.setState({ isSaved: true });
@@ -175,6 +174,18 @@ class AddTicketPage extends Component {
                       </Grid>
                     )}
                   </>
+                )}
+                {grievantType === 'user' && (
+                  <Grid item xs={6} className={classes.item}>
+                    <PublishedComponent
+                      pubRef="admin.UserPicker"
+                      value={stateEdited.reporter}
+                      label="Complainant"
+                      onChange={(v) => this.updateAttribute('reporter', v)}
+                      benefitPlan={benefitPlan}
+                      readOnly={isSaved}
+                    />
+                  </Grid>
                 )}
               </Grid>
               <Divider />
@@ -308,8 +319,15 @@ class AddTicketPage extends Component {
                     component="label"
                     color="primary"
                     onClick={this.save}
-                    // eslint-disable-next-line max-len
-                    disabled={!stateEdited.channel || !stateEdited.flags || !stateEdited.channel || !stateEdited.title || isSaved}
+                    disabled={
+                      (!stateEdited.channel || !stateEdited.flags || !stateEdited.title || isSaved)
+                      || ((
+                        stateEdited.reporterType === 'individual'
+                        || stateEdited.reporterType === 'beneficiary'
+                        || stateEdited.reporterType === 'user')
+                        && stateEdited.reporter === null
+                      )
+                    }
                   >
                     <Save />
                   </IconButton>

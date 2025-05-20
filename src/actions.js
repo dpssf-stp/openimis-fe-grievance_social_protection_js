@@ -38,6 +38,7 @@ export function fetchTicketSummaries(mm, filters) {
     'priority', 'dueDate', 'reporter', 'reporterId',
     'reporterType', 'reporterTypeName', 'category', 'flags',
     'channel', 'resolution', 'title', 'dateOfIncident', 'dateCreated', 'version', 'isHistory',
+    'reporterFirstName', 'reporterLastName', 'reporterDob',
   ];
   const payload = formatPageQueryWithCount(
     'tickets',
@@ -54,6 +55,7 @@ export function fetchTicket(mm, filters) {
     'reporterType', 'reporterTypeName', 'reporterInfo', 'category', 'flags', 'channel',
     'resolution', 'title', 'dateOfIncident', 'dateCreated',
     'attendingStaff {id, username}', 'version', 'isHistory,', 'jsonExt',
+    'reporterFirstName', 'reporterLastName', 'reporterDob',
   ];
   const payload = formatPageQueryWithCount(
     'tickets',
@@ -78,6 +80,9 @@ export function fetchComments(ticket) {
       'comment',
       'isResolution',
       'dateCreated',
+      'commenterFirstName',
+      'commenterLastName',
+      'commenterDob',
     ];
     const payload = formatPageQueryWithCount(
       'comments',
@@ -90,12 +95,10 @@ export function fetchComments(ticket) {
 }
 
 export function formatTicketGQL(ticket) {
-  let reporter_info = JSON.stringify(JSON.stringify(ticket.reporterInfo));
-  let reporterId = ticket.reporter ? (
+  const reporter_info = JSON.stringify(JSON.stringify(ticket.reporterInfo));
+  const reporterId = ticket.reporter ? (
     isBase64Encoded(ticket.reporter.id) ? decodeId(ticket.reporter.id) : ticket.reporter.id
   ) : '';
-  console.log('ticket', ticket);
-  console.log('reporterId', reporterId);
 
   return `
     ${ticket.id !== undefined && ticket.id !== null ? `id: "${ticket.id}"` : ''}
@@ -104,7 +107,7 @@ export function formatTicketGQL(ticket) {
     ${ticket.title ? `title: "${ticket.title}"` : ''}
     ${ticket.description ? `description: "${ticket.description}"` : ''}
     ${ticket.reporterType ? `reporterType: "${ticket.reporterType}"` : ''}
-    ${ticket.reporterId ? `reporterId: "${reporterId}"` : ''}
+    ${ticket.reporter ? `reporterId: "${reporterId}"` : ''}
     ${ticket.reporterInfo ? `reporterInfo: ${reporter_info}` : ''}
     ${ticket.status ? `status: "${ticket.status}"` : ''}
     ${ticket.priority ? `priority: "${ticket.priority}"` : ''}
@@ -116,7 +119,7 @@ export function formatTicketGQL(ticket) {
 }
 
 export function formatUpdateTicketGQL(ticket) {
-  let reporter_info = JSON.stringify(JSON.stringify(ticket.reporterInfo));
+  const reporter_info = JSON.stringify(JSON.stringify(ticket.reporterInfo));
 
   // eslint-disable-next-line no-param-reassign
   if (ticket.reporter) ticket.reporter = JSON.parse(JSON.parse(ticket.reporter || '{}'), '{}');
@@ -131,7 +134,7 @@ export function formatUpdateTicketGQL(ticket) {
       ? `reporterId: "${decodeId(ticket.reporter.id)}"`
       : `reporterId: "${ticket.reporter.id}"`)
     : ''}
-    ${!!ticket.reporter && !!ticket.reporter ? 'reporterType: "Individual"' : ''}
+    ${!!ticket.reporter && !!ticket.reporter ? `reporterType: "${ticket.reporterTypeName}"` : ''}
     ${ticket.nameOfComplainant ? `nameOfComplainant: "${formatGQLString(ticket.nameOfComplainant)}"` : ''}
     ${ticket.reporterInfo ? `reporterInfo: ${reporter_info}` : ''}
     ${ticket.resolution ? `resolution: "${formatGQLString(ticket.resolution)}"` : ''}

@@ -85,7 +85,7 @@
     "Ticket Status.RESOLVED":"Resolved",
     "Ticket Status.REJECTED":"Rejected",
     "ticketStatus.CLOSED":"Closed",
-    "ticket.ticketStatus.null":"None",
+    "ticket.ticketStatus.null":"Any",
     "ticket.ticketStatus.RECEIVED":"Received",
     "ticket.ticketStatus.OPEN":"Open",
     "ticket.ticketStatus.IN_PROGRESS":"In Progress",
