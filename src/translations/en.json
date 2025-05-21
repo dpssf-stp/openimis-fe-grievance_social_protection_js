@@ -90,6 +90,7 @@
     "ticket.ticketStatus.OPEN":"Open",
     "ticket.ticketStatus.IN_PROGRESS":"In Progress",
     "ticket.ticketStatus.RESOLVED":"Resolved",
+    "ticket.ticketStatus.REJECTED":"Rejected",
     "ticket.ticketStatus.CLOSED":"Closed",
     "category.label":"Category",
     "Ticket Status":"Status",
