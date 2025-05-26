@@ -15,7 +15,10 @@ const styles = (theme) => ({
 });
 
 const ReporterFields = ({ classes, stateEdited, updateAttribute, isSaved }) => {
-  const reporter = stateEdited?.reporter || {};
+  const reporter = stateEdited?.reporter
+    ? (() => { try { return JSON.parse(JSON.parse(stateEdited.reporter)); } catch { return {}; } })()
+    : {};
+
   const reporterInfo = stateEdited?.reporterInfo || {};
 
   // Helper to update a single key in reporterInfo JSON
@@ -30,9 +33,11 @@ const ReporterFields = ({ classes, stateEdited, updateAttribute, isSaved }) => {
           module={MODULE_NAME}
           label="ticket.name"
           value={
-            reporter.firstName && reporter.lastName
+            reporterInfo.name
+              ? reporterInfo.name
+              : reporter.firstName && reporter.lastName
               ? `${reporter.firstName} ${reporter.lastName}`
-              : reporterInfo.name || EMPTY_STRING
+              : EMPTY_STRING
           }
           onChange={(v) => updateReporterInfo('name', v)}
           required={false}
@@ -44,7 +49,11 @@ const ReporterFields = ({ classes, stateEdited, updateAttribute, isSaved }) => {
           pubRef="core.DatePicker"
           module={MODULE_NAME}
           label="ticket.dob"
-          value={reporter.dob || reporterInfo.dob || EMPTY_STRING}
+          value={
+            reporterInfo.dob
+              ? reporterInfo.dob
+              : reporter.dob || EMPTY_STRING
+          }
           onChange={(v) => updateReporterInfo('dob', v)}
           required={false}
           readOnly={isSaved}

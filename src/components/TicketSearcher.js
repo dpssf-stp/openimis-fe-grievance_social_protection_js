@@ -198,7 +198,14 @@ class TicketSearcher extends Component {
         return picker;
       },
       (ticket) => ticket.priority,
-      (ticket) => ticket.status,
+      (ticket) => (
+        <PublishedComponent
+          pubRef="grievanceSocialProtection.TicketStatusPicker"
+          readOnly
+          value={ticket.status}
+          module={MODULE_NAME}
+        />
+      ),
       (ticket) => ticket.category,
       (ticket) => (this.isShowHistory() ? ticket?.version : null),
     ];
